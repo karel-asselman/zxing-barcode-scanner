@@ -11,18 +11,27 @@ import { BarcodeFormat } from '@zxing/library';
   styleUrls: ['./app.scss'],
 })
 export class App {
-  selectedFormat: 'QR' | 'Code128' = 'QR';
-  allowedFormats = [BarcodeFormat.QR_CODE];
+  allowedFormats = [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128];
   scannedResult: Array<string> = [];
   hasDevices = false;
   availableDevices: MediaDeviceInfo[] = [];
   selectedDevice: MediaDeviceInfo | undefined;
 
   videoConstraints: MediaTrackConstraints = {
-    width: { ideal: 1920 },
-    height: { ideal: 1080 },
-    advanced: [{ aspectRatio: 1 / 1 }]
+    width: { ideal: 3840 },
+    height: { ideal: 2160 },
+    facingMode: 'environment',
+    advanced: [{ focusMode: 'continuous', focusDistance: '0.1' } as any]
   };
+
+
+  onCamerasFound(devices: MediaDeviceInfo[]) {
+    this.availableDevices = devices;
+    if (devices.length > 0) {
+      this.selectedDevice = devices[0];
+    }
+  }
+
 
   onCodeResult(result: string) {
     this.scannedResult.push(result);
@@ -37,27 +46,11 @@ export class App {
     this.hasDevices = hasDevices;
   }
 
-  onDevicesFound(devices: MediaDeviceInfo[]) {
-    this.availableDevices = devices;
-    if (devices.length > 0) {
-      this.selectedDevice = devices[0];
-    }
-  }
-
-  onFormatChange(format: 'QR' | 'Code128') {
-    this.selectedFormat = format;
-    this.allowedFormats = format === 'QR' ? [BarcodeFormat.QR_CODE] : [BarcodeFormat.CODE_128];
-    this.videoConstraints = {
-      ...this.videoConstraints,
-      advanced: [{ aspectRatio: format === 'QR' ? 1 / 1 : 3 / 1 }]
-    };
-  }
-
   onError(error: any) {
     console.error('Barcode scanning error:', error);
   }
 
   getName(format: BarcodeFormat): string {
-    return BarcodeFormat[format] || 'Unknown Format';    
+    return BarcodeFormat[format] || 'Unknown Format';
   }
 }

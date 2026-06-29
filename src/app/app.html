@@ -1,15 +1,7 @@
 <h3>Zxing Barcode Scanner</h3>
-
-<div>
-  <label>
-    <input type="radio" name="format" value="QR" [checked]="selectedFormat === 'QR'" (change)="onFormatChange('QR')" />
-    QR Code
-  </label>
-  <label>
-    <input type="radio" name="format" value="Code128" [checked]="selectedFormat === 'Code128'" (change)="onFormatChange('Code128')" />
-    Code 128
-  </label>
-</div>
+@for (allowedFormat of allowedFormats; track allowedFormat) {
+  <span>{{ getName(allowedFormat) }} </span>
+}
  @if(hasDevices)
  {
    <div >
@@ -26,11 +18,11 @@
   [formats]="allowedFormats"
   [autostart]="true"
   [device]="selectedDevice"
-  [autofocusEnabled]="true" 
+  [autofocusEnabled]="true"
   [tryHarder]="true"
   [videoConstraints]="videoConstraints"
   (scanSuccess)="onCodeResult($event)"
-  (camerasFound)="onDevicesFound($event)"
+  (camerasFound)="onCamerasFound($event)"
   (camerasNotFound)="onHasDevices(false)"
   (scanError)="onError($event)"
 ></zxing-scanner>
@@ -40,7 +32,9 @@
    <div>
      <h3>Scanned Codes:</h3>
      <ul>
-       <li *ngFor="let code of scannedResult">{{ code }}</li>
+       @for (code of scannedResult; track code) {
+         <li>{{ code }}</li>
+       }
      </ul>
    </div>
  }
