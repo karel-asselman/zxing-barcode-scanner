@@ -20,7 +20,11 @@ export class App {
 
   @ViewChild('scanCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   
-  private reader = new BrowserMultiFormatReader();
+  private reader = new BrowserMultiFormatReader(
+     
+
+
+  );
   private videoElement!: HTMLVideoElement;
 
   videoConstraints: MediaTrackConstraints = {
@@ -56,8 +60,8 @@ export class App {
         // Define your ROI (Region of Interest) boundaries
         const roiWidth = 300;
         const roiHeight = 150;
-        const roiX = Math.floor(canvas.width * 0.6);
-        const roiY = Math.floor(canvas.height / 3);
+         const roiX = (canvas.width - roiWidth) / 2;
+        const roiY = (canvas.height - roiHeight) / 2;
 
         // Crop pixel matrix exclusively within the bounding coordinates
         const imgData = ctx?.getImageData(roiX, roiY, roiWidth, roiHeight);
