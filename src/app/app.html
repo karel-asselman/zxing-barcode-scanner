@@ -14,18 +14,17 @@
     </div>
   }
     
-<zxing-scanner
-  [formats]="allowedFormats"
-  [autostart]="true"
-  [device]="selectedDevice"
-  [autofocusEnabled]="true"
-  [tryHarder]="true"
-  [videoConstraints]="videoConstraints"
-  (scanSuccess)="onCodeResult($event)"
-  (camerasFound)="onCamerasFound($event)"
-  (camerasNotFound)="onHasDevices(false)"
-  (scanError)="onError($event)"
-></zxing-scanner>
+<div class="scanner-container">
+  <!-- 1. The hidden scanner component used purely to initialize the camera stream -->
+  <zxing-scanner #scanner (camerasFound)="onCamerasFound($event)" style="display: none;"></zxing-scanner>
+  
+  <!-- 2. The canvas displaying your visible, restricted scanning window -->
+  <canvas #scanCanvas width="640" height="480"></canvas>
+  
+  <!-- 3. CSS Overlay to visual show the targeted framing rect -->
+  <div class="focus-box"></div>
+</div>
+
 
  @if(scannedResult.length > 0)
  {

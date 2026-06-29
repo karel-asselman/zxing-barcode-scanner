@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { BarcodeFormat } from '@zxing/library';
+import { BrowserMultiFormatReader, RGBLuminanceSource, BinaryBitmap, HybridBinarizer } from '@zxing/library';
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,11 @@ export class App {
   availableDevices: MediaDeviceInfo[] = [];
   selectedDevice: MediaDeviceInfo | undefined;
 
+  @ViewChild('scanCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
+  
+  private reader = new BrowserMultiFormatReader();
+  private videoElement!: HTMLVideoElement;
+
   videoConstraints: MediaTrackConstraints = {
     width: { ideal: 3840 },
     height: { ideal: 2160 },
@@ -30,11 +36,56 @@ export class App {
     if (devices.length > 0) {
       this.selectedDevice = devices[0];
     }
+
+     setTimeout(() => {
+      this.videoElement = document.querySelector('zxing-scanner video') as HTMLVideoElement;
+      if (this.videoElement) {
+        this.startCropLoop();
+      }
+    }, 1000);
   }
 
+  startCropLoop() {
+    const canvas = this.canvasRef.nativeElement;
+    const ctx = canvas.getContext('2d');
 
-  onCodeResult(result: string) {
-    this.scannedResult.push(result);
+    const loop = () => {
+      if (this.videoElement && !this.videoElement.paused && !this.videoElement.ended) {
+        ctx?.drawImage(this.videoElement, 0, 0, canvas.width, canvas.height);
+        
+        // Define your ROI (Region of Interest) boundaries
+        const roiWidth = 300;
+        const roiHeight = 150;
+        const roiX = (canvas.width - roiWidth) / 2;
+        const roiY = (canvas.height - roiHeight) / 2;
+
+        // Crop pixel matrix exclusively within the bounding coordinates
+        const imgData = ctx?.getImageData(roiX, roiY, roiWidth, roiHeight);
+        
+        if (imgData) {
+          this.decodeCroppedZone(imgData, roiWidth, roiHeight);
+        }
+      }
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+
+decodeCroppedZone(imgData: ImageData, width: number, height: number) {
+    const luminanceSource = new RGBLuminanceSource(
+      new Uint8ClampedArray(imgData.data.buffer), 
+      width, 
+      height
+    );
+    const bitmap = new BinaryBitmap(new HybridBinarizer(luminanceSource));
+
+    try {
+      // Decode hints are processed significantly quicker within a small matrix
+      const result = this.reader.decodeBitmap(bitmap);
+      this.scannedResult.push(result.getText());  
+    } catch (e) {
+      // No code found within the bounding box this frame
+    }
   }
 
   onDeviceSelectChange(event: Event) {
