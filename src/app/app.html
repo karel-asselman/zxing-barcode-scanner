@@ -16,7 +16,9 @@
     
 <div class="scanner-container">
   <!-- 1. The hidden scanner component used purely to initialize the camera stream -->
-  <zxing-scanner #scanner (camerasFound)="onCamerasFound($event)" style="display: none;"></zxing-scanner>
+  <zxing-scanner #scanner 
+  [videoConstraints]="videoConstraints"
+  (camerasFound)="onCamerasFound($event)" style="display: none;"></zxing-scanner>
   
   <!-- 2. The canvas displaying your visible, restricted scanning window -->
   <canvas #scanCanvas width="640" height="480"></canvas>
