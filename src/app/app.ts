@@ -11,11 +11,18 @@ import { BarcodeFormat } from '@zxing/library';
   styleUrls: ['./app.scss'],
 })
 export class App {
-  allowedFormats = [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128];
+  selectedFormat: 'QR' | 'Code128' = 'QR';
+  allowedFormats = [BarcodeFormat.QR_CODE];
   scannedResult: Array<string> = [];
   hasDevices = false;
   availableDevices: MediaDeviceInfo[] = [];
   selectedDevice: MediaDeviceInfo | undefined;
+
+  videoConstraints: MediaTrackConstraints = {
+    width: { ideal: 1920 },
+    height: { ideal: 1080 },
+    advanced: [{ aspectRatio: 1 / 1 }]
+  };
 
   onCodeResult(result: string) {
     this.scannedResult.push(result);
@@ -35,6 +42,15 @@ export class App {
     if (devices.length > 0) {
       this.selectedDevice = devices[0];
     }
+  }
+
+  onFormatChange(format: 'QR' | 'Code128') {
+    this.selectedFormat = format;
+    this.allowedFormats = format === 'QR' ? [BarcodeFormat.QR_CODE] : [BarcodeFormat.CODE_128];
+    this.videoConstraints = {
+      ...this.videoConstraints,
+      advanced: [{ aspectRatio: format === 'QR' ? 1 / 1 : 3 / 1 }]
+    };
   }
 
   onError(error: any) {
