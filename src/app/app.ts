@@ -20,10 +20,11 @@ export class App {
 
   @ViewChild('scanCanvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
   
-  private reader = new BrowserMultiFormatReader(
-     
-
-
+  private reader = new BrowserMultiFormatReader(     
+    new Map<number, any>([
+      [2, [BarcodeFormat.CODE_128, BarcodeFormat.QR_CODE]],
+      [3, true] // Set TRY_HARDER hint
+    ])
   );
   private videoElement!: HTMLVideoElement;
 
