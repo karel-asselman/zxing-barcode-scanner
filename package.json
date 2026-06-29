@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "github-build": "ng build --configuration production --base-href https://asselmankarel.github.io/angular-barcode-scanner/",
+    "github-build": "ng build --configuration production --base-href https://karel-asselman.github.io/zxing-barcode-scanner/",
     "github-deploy": "npx angular-cli-ghpages --dir=dist/zxing-barcode-scanner/browser --no-silent"
   },
   "private": true,

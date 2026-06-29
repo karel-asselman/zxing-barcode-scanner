@@ -1,16 +1,19 @@
-<h1>Zxing Barcode Scanner</h1>
-
-<!-- Camera selection dropdown -->
-<div *ngIf="hasDevices">
-  <label for="deviceSelect">Choose Camera:</label>
-  <select id="deviceSelect" (change)="onDeviceSelectChange($event)">
-    <option *ngFor="let device of availableDevices" [value]="device.deviceId">
-      {{ device.label || 'Unknown Camera' }}
-    </option>
-  </select>
-</div>
-
-<!-- Barcode scanner component -->
+<h3>Zxing Barcode Scanner</h3>
+<span *ngFor="let item of allowedFormats">
+  {{  getName(item) }} 
+</span>
+ @if(hasDevices)
+ {
+   <div >
+     <label for="deviceSelect">Choose Camera:</label>
+     <select id="deviceSelect" (change)="onDeviceSelectChange($event)">
+       <option *ngFor="let device of availableDevices" [value]="device.deviceId">
+         {{ device.label || 'Unknown Camera' }}
+        </option>
+      </select>
+    </div>
+  }
+    
 <zxing-scanner
   [formats]="allowedFormats"
   [autostart]="true"
@@ -21,7 +24,12 @@
   (scanError)="onError($event)"
 ></zxing-scanner>
 
-<!-- Display scanned result -->
-<p *ngIf="scannedResult">
-  <strong>Scanned Code:</strong> {{ scannedResult }}
-</p>
+ @if(scannedResult.length > 0)
+ {
+   <div>
+     <h3>Scanned Codes:</h3>
+     <ul>
+       <li *ngFor="let code of scannedResult">{{ code }}</li>
+     </ul>
+   </div>
+ }

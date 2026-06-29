@@ -11,18 +11,18 @@ import { BarcodeFormat } from '@zxing/library';
   styleUrls: ['./app.scss'],
 })
 export class App {
-  allowedFormats = [BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX, BarcodeFormat.AZTEC];
-  scannedResult: string | null = null;
+  allowedFormats = [BarcodeFormat.QR_CODE, BarcodeFormat.CODE_128];
+  scannedResult: Array<string> = [];
   hasDevices = false;
   availableDevices: MediaDeviceInfo[] = [];
-  selectedDevice: MediaDeviceInfo | undefined;  // Fix: Use `undefined` instead of `null`
+  selectedDevice: MediaDeviceInfo | undefined;
 
   onCodeResult(result: string) {
-    this.scannedResult = result;
+    this.scannedResult.push(result);
   }
 
   onDeviceSelectChange(event: Event) {
-    const target = event.target as HTMLSelectElement; // Fix: Properly typecast EventTarget
+    const target = event.target as HTMLSelectElement;
     this.selectedDevice = this.availableDevices.find(device => device.deviceId === target.value);
   }
 
@@ -33,11 +33,15 @@ export class App {
   onDevicesFound(devices: MediaDeviceInfo[]) {
     this.availableDevices = devices;
     if (devices.length > 0) {
-      this.selectedDevice = devices[0]; // Fix: Ensure a device is selected initially
+      this.selectedDevice = devices[0];
     }
   }
 
   onError(error: any) {
     console.error('Barcode scanning error:', error);
+  }
+
+  getName(format: BarcodeFormat): string {
+    return BarcodeFormat[format] || 'Unknown Format';    
   }
 }
